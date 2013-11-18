@@ -22,10 +22,16 @@ public class CouchbaseBucketCommands implements CommandMarker {
     private static final String REPLACE = "replace";
     private static final String DELETE = "delete";
     private static final String COUNT_DOCS = "count-docs";
+    private static final String QUERY = "query";
 
     @CliAvailabilityIndicator({GET, SET, ADD, REPLACE, DELETE, COUNT_DOCS})
     public boolean isConnected() {
         return shell.isConnected();
+    }
+
+    @CliAvailabilityIndicator({QUERY})
+    public boolean hasQuery() {
+        return shell.isConnected() && shell.hasQuery();
     }
 
     @CliCommand(value = GET, help = "Retreive a document from the server.")
@@ -146,6 +152,20 @@ public class CouchbaseBucketCommands implements CommandMarker {
             return shell.countDocs() + " documents found.";
         } catch(Exception ex) {
             return "Could not count the number of documents in the bucket!";
+        }
+    }
+
+    @CliCommand(value = QUERY, help = "Query using N1QL")
+    public String query(
+        @CliOption(
+                mandatory = true, key = "query", help = "The actual query to run"
+        ) String query
+    ) {
+        if (shell.hasQuery()) {
+            String result = shell.query(query).toString();
+            return result;
+        } else {
+            return "Query engine is not connected.";
         }
     }
 

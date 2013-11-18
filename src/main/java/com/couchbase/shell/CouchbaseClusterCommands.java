@@ -40,9 +40,13 @@ public class CouchbaseClusterCommands implements CommandMarker {
         @CliOption(
             key = "password", help = "The password of the bucket in the cluster",
             unspecifiedDefaultValue = ""
-        ) String password
+        ) String password,
+        @CliOption(
+            key = "query", help = "Optional N1QL hostname",
+            unspecifiedDefaultValue = "", specifiedDefaultValue = "127.0.0.1"
+        ) String query
     ) {
-        if (shell.connect(hostname, bucket, password)) {
+        if (shell.connect(hostname, bucket, password, query)) {
             return "Connected.";
         } else {
             return "Could not connect!";

@@ -1,10 +1,13 @@
 package com.couchbase.shell;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.shell.plugin.PromptProvider;
 import org.springframework.stereotype.Component;
 
 @Component
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class CouchbasePromptProvider implements PromptProvider {
 
     @Autowired
@@ -12,7 +15,13 @@ public class CouchbasePromptProvider implements PromptProvider {
 
     @Override
     public String getPrompt() {
-        return "cb-shell>";
+        StringBuilder sb = new StringBuilder();
+        sb.append("cb-shell");
+        if (shell.isConnected()) {
+            sb.append("[" + shell.getBucket() + "]");
+        }
+        sb.append(">");
+        return sb.toString();
     }
 
     @Override

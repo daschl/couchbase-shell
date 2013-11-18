@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Properties;
 
 /**
  * Basic encapsulation for a {@link com.couchbase.client.CouchbaseClient}.
@@ -20,6 +21,10 @@ public class CouchbaseShell {
 
     public CouchbaseShell() {
         connected = false;
+
+        Properties systemProperties = System.getProperties();
+        systemProperties.put("net.spy.log.LoggerImpl", "net.spy.memcached.compat.log.Log4JLogger");
+        System.setProperties(systemProperties);
     }
 
     public boolean connect(String hostname, String bucket, String password) {

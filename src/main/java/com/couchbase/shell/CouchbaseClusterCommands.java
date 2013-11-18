@@ -13,11 +13,11 @@ public class CouchbaseClusterCommands implements CommandMarker {
     @Autowired
     private CouchbaseShell shell;
 
-    private static final String CONNECT = "cluster connect";
+    private static final String CONNECT = "connect";
 
-    private static final String DISCONNECT = "cluster disconnect";
+    private static final String DISCONNECT = "disconnect";
 
-    /*@CliAvailabilityIndicator({DISCONNECT})
+    @CliAvailabilityIndicator({DISCONNECT})
     public boolean isConnected() {
         return shell.isConnected();
     }
@@ -25,7 +25,7 @@ public class CouchbaseClusterCommands implements CommandMarker {
     @CliAvailabilityIndicator({CONNECT})
     public boolean isDisconnected() {
         return !shell.isConnected();
-    }*/
+    }
 
     @CliCommand(value = CONNECT, help = "Connect to a Cluster")
     public String connect(

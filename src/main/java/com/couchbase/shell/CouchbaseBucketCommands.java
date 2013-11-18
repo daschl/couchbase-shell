@@ -16,12 +16,12 @@ public class CouchbaseBucketCommands implements CommandMarker {
     @Autowired
     private CouchbaseShell shell;
 
-    private static final String GET = "bucket get";
-    private static final String SET = "bucket set";
-    private static final String ADD = "bucket add";
-    private static final String REPLACE = "bucket replace";
-    private static final String DELETE = "bucket delete";
-    private static final String COUNT_DOCS = "bucket count-docs";
+    private static final String GET = "get";
+    private static final String SET = "set";
+    private static final String ADD = "add";
+    private static final String REPLACE = "replace";
+    private static final String DELETE = "delete";
+    private static final String COUNT_DOCS = "count-docs";
 
     @CliAvailabilityIndicator({GET, SET, ADD, REPLACE, DELETE, COUNT_DOCS})
     public boolean isConnected() {

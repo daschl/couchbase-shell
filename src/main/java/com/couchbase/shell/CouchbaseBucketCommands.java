@@ -47,7 +47,7 @@ public class CouchbaseBucketCommands implements CommandMarker {
     @CliCommand(value = GET, help = "Retreive a document from the server.")
     public String get(
         @CliOption(
-                mandatory = true, key = "key", help = "The unique name of the key in this bucket"
+                mandatory = true, key = { "", "key" }, help = "The unique name of the key in this bucket"
         ) String key
     ) {
         try {
@@ -68,7 +68,7 @@ public class CouchbaseBucketCommands implements CommandMarker {
     @CliCommand(value = SET, help = "Store a value on the server")
     public String set(
         @CliOption(
-            mandatory = true, key = "key", help = "The unique name of the key in this bucket"
+            mandatory = true, key = { "", "key" }, help = "The unique name of the key in this bucket"
         ) String key,
         @CliOption(
             mandatory = true, key = "value", help = "The actual value of the document"
@@ -93,7 +93,7 @@ public class CouchbaseBucketCommands implements CommandMarker {
     @CliCommand(value = ADD, help = "Add a value on the server")
     public String add(
             @CliOption(
-                    mandatory = true, key = "key", help = "The unique name of the key in this bucket"
+                    mandatory = true, key = { "", "key" }, help = "The unique name of the key in this bucket"
             ) String key,
             @CliOption(
                     mandatory = true, key = "value", help = "The actual value of the document"
@@ -118,7 +118,7 @@ public class CouchbaseBucketCommands implements CommandMarker {
     @CliCommand(value = REPLACE, help = "Replace a value on the server")
     public String replace(
             @CliOption(
-                    mandatory = true, key = "key", help = "The unique name of the key in this bucket"
+                    mandatory = true, key = { "", "key" }, help = "The unique name of the key in this bucket"
             ) String key,
             @CliOption(
                     mandatory = true, key = "value", help = "The actual value of the document"
@@ -142,7 +142,7 @@ public class CouchbaseBucketCommands implements CommandMarker {
     @CliCommand(value = DELETE, help = "DELETE a value on the server")
     public String delete(
             @CliOption(
-                    mandatory = true, key = "key", help = "The unique name of the key in this bucket"
+                    mandatory = true, key = { "", "key" }, help = "The unique name of the key in this bucket"
             ) String key
     ) {
         try {
@@ -168,7 +168,7 @@ public class CouchbaseBucketCommands implements CommandMarker {
     @CliCommand(value = QUERY, help = "Query using N1QL")
     public String query(
         @CliOption(
-                mandatory = true, key = "query", help = "The actual query to run"
+                mandatory = true, key = { "", "query" }, help = "The actual query to run"
         ) String query
     ) {
         if (shell.hasQuery()) {

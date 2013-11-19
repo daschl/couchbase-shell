@@ -1,5 +1,11 @@
 package com.couchbase.shell;
 
+import com.couchbase.client.mapping.QueryError;
+import com.couchbase.client.mapping.QueryResult;
+import com.couchbase.client.mapping.QueryRow;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import net.spy.memcached.internal.GetFuture;
 import net.spy.memcached.internal.OperationFuture;
 import net.spy.memcached.ops.OperationStatus;
@@ -9,6 +15,10 @@ import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class CouchbaseBucketCommands implements CommandMarker {
@@ -162,8 +172,20 @@ public class CouchbaseBucketCommands implements CommandMarker {
         ) String query
     ) {
         if (shell.hasQuery()) {
-            String result = shell.query(query).toString();
-            return result;
+            StringBuilder sb = new StringBuilder();
+            QueryResult res = shell.query(query);
+            if (res.isSuccess()) {
+                for (QueryRow row : res.getResult()) {
+                    try {
+                        sb.append(row.toString());
+                    } catch (Exception ex) {
+                        sb.append("Error while parsing: " + ex.getMessage());
+                    }
+                }
+            } else {
+                sb.append(formatQueryError(res.getError()));
+            }
+            return sb.toString();
         } else {
             return "Query engine is not connected.";
         }
@@ -171,6 +193,10 @@ public class CouchbaseBucketCommands implements CommandMarker {
 
     private String formatStatusLine(OperationStatus status) {
         return "Success: " + status.isSuccess() + ", Message: " + status.getMessage();
+    }
+
+    private String formatQueryError(QueryError error) {
+        return "Code: " + error.getCode() + ", Message: " + error.getMessage();
     }
 
 

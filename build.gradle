@@ -1,0 +1,27 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+description = "Couchbase Shell"
+version = '1.0.0-SNAPSHOT'
+
+sourceCompatibility = 1.6
+mainClassName = "org.springframework.shell.Bootstrap"
+
+repositories {
+    mavenLocal()
+    maven { url "http://repo.springsource.org/libs-milestone" }
+    maven { url "http://repo.springsource.org/libs-release" }
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'org.springframework.shell', name: 'spring-shell', version: '1.1.0.M1'
+    compile group: 'org.springframework', name: 'spring-web', version: '3.1.2.RELEASE'
+    compile group: 'com.couchbase.client', name: 'couchbase-client', version: '1.2.3'
+    compile group: 'com.couchbase.client', name: 'couchbase-query', version: '1.0-SNAPSHOT'
+    runtime group: 'log4j', name: 'log4j', version: '1.2.17'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.10'
+}

@@ -2,3 +2,6 @@
 *.iml
 *.log
 target/
+build/
+.DS_Store
+.gradle/

@@ -23,7 +23,7 @@ public class CouchbaseBannerProvider extends DefaultBannerProvider {
     }
 
     public String getVersion() {
-        return "1.0.0-SNAPSHOT";
+        return "0.1";
     }
 
     public String getWelcomeMessage() {

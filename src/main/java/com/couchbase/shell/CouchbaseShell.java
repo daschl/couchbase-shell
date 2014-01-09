@@ -1,9 +1,32 @@
+/**
+ * Copyright (C) 2014 Couchbase, Inc.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING
+ * IN THE SOFTWARE.
+ */
+
 package com.couchbase.shell;
 
 import com.couchbase.client.CouchbaseClient;
 import com.couchbase.client.CouchbaseClientIF;
 import com.couchbase.client.CouchbaseQueryClient;
 import com.couchbase.client.mapping.QueryResult;
+import net.spy.memcached.CASValue;
 import net.spy.memcached.internal.GetFuture;
 import net.spy.memcached.internal.OperationFuture;
 import org.springframework.stereotype.Component;
@@ -32,32 +55,28 @@ public class CouchbaseShell {
         System.setProperties(systemProperties);
     }
 
-    public boolean connect(String hostname, String bucket, String password, String query) {
+    public boolean connect(String hostname, String bucket, String password, String query) throws Exception {
         this.bucket = bucket;
         if (connected) {
             return true;
         }
 
-        try {
-            if (query != null && !query.isEmpty()) {
-                client = new CouchbaseQueryClient(
-                        Arrays.asList(hostname),
-                        Arrays.asList(query),
-                        bucket,
-                        password);
-                hasQuery = true;
-            } else {
-                client = new CouchbaseClient(
-                        Arrays.asList(new URI("http://" + hostname + ":8091/pools")),
-                        bucket,
-                        password
-                );
-            }
-            connected = true;
-            return true;
-        } catch(Exception e) {
-            return false;
+        if (query != null && !query.isEmpty()) {
+            client = new CouchbaseQueryClient(
+                    Arrays.asList(hostname),
+                    Arrays.asList(query),
+                    bucket,
+                    password);
+            hasQuery = true;
+        } else {
+            client = new CouchbaseClient(
+                    Arrays.asList(new URI("http://" + hostname + ":8091/pools")),
+                    bucket,
+                    password
+            );
         }
+        connected = true;
+        return true;
     }
 
     public boolean hasQuery() {
@@ -92,8 +111,8 @@ public class CouchbaseShell {
         return bucket;
     }
 
-    GetFuture<Object> get(String key) {
-        return (GetFuture<Object>) client.asyncGet(key);
+    GetFuture<CASValue<Object>> get(String key) {
+        return (GetFuture<CASValue<Object>>) client.asyncGets(key);
     }
 
     OperationFuture<Boolean> set(String key, Object value, int exp) {

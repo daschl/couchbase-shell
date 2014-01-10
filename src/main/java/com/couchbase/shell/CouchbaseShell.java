@@ -111,8 +111,8 @@ public class CouchbaseShell {
         return bucket;
     }
 
-    GetFuture<CASValue<Object>> get(String key) {
-        return (GetFuture<CASValue<Object>>) client.asyncGets(key);
+    OperationFuture<CASValue<Object>> get(String key) {
+        return (OperationFuture<CASValue<Object>>) client.asyncGets(key);
     }
 
     OperationFuture<Boolean> set(String key, Object value, int exp) {

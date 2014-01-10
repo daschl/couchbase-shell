@@ -40,7 +40,7 @@ public class CouchbaseBannerProvider extends DefaultBannerProvider {
         buf.append("|    .-. .  . .-.|--. |.-.  .-.  .--. .-.    `-. |--. .-. | |" + OsUtils.LINE_SEPARATOR);
         buf.append(":   (   )|  |(   |  | |   )(   ) `--.(.-'   (   )|  |(.-' | |" + OsUtils.LINE_SEPARATOR);
         buf.append("`--'`-' `--`-`-''  `-'`-'  `-'`-`--' `--'   `-' '  `-`--'`-`-" + OsUtils.LINE_SEPARATOR);
-        buf.append("Version:" + this.getVersion());
+        buf.append("Version: " + this.getVersion());
         return buf.toString();
     }
 

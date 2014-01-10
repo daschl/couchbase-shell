@@ -31,6 +31,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import net.spy.memcached.CASValue;
 import net.spy.memcached.internal.GetFuture;
 import net.spy.memcached.internal.OperationFuture;
+import net.spy.memcached.ops.Operation;
 import net.spy.memcached.ops.OperationStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.CommandMarker;
@@ -42,6 +43,7 @@ import org.springframework.stereotype.Component;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class CouchbaseBucketCommands implements CommandMarker {
@@ -56,8 +58,9 @@ public class CouchbaseBucketCommands implements CommandMarker {
     private static final String DELETE = "delete";
     private static final String COUNT_DOCS = "count-docs";
     private static final String QUERY = "query";
+    private static final String GETPING = "gping";
 
-    @CliAvailabilityIndicator({GET, SET, ADD, REPLACE, DELETE, COUNT_DOCS})
+    @CliAvailabilityIndicator({GET, SET, ADD, REPLACE, DELETE, COUNT_DOCS, GETPING})
     public boolean isConnected() {
         return shell.isConnected();
     }
@@ -74,7 +77,7 @@ public class CouchbaseBucketCommands implements CommandMarker {
         ) String key
     ) {
         try {
-            GetFuture<CASValue<Object>> future = shell.get(key);
+            OperationFuture<CASValue<Object>> future = shell.get(key);
             future.get();
             StringBuilder builder = new StringBuilder();
             builder.append(formatStatusLine(future.getStatus()));
@@ -85,6 +88,58 @@ public class CouchbaseBucketCommands implements CommandMarker {
             if (data != null) {
                 builder.append("\n" + data.getValue());
             }
+            return builder.toString();
+        } catch (Exception ex) {
+            return "Could not get document " + key + " because of an error! ";
+        }
+    }
+
+    @CliCommand(value = GETPING, help = "Retreive a document from the server for a perioud and count the time.")
+    public String getping(
+            @CliOption(
+                    mandatory = true, key = { "", "key" }, help = "The unique name of the key in this bucket"
+            ) String key,
+            @CliOption(
+                    key = "runs", help = "The number of pings to perform", unspecifiedDefaultValue = "10"
+            ) String runs,
+            @CliOption(
+                    key = "delay", help = "Time to sleep between pings", unspecifiedDefaultValue = "0"
+            ) String delay
+    ) {
+        try {
+            int totalRuns = Integer.parseInt(runs);
+            int del = Integer.parseInt(delay);
+
+            StringBuilder builder = new StringBuilder();
+            long total = 0;
+            long totalMin = Integer.MAX_VALUE;
+            long totalMax = Integer.MIN_VALUE;
+            for (int i = 0; i < totalRuns; i++) {
+                long start = System.nanoTime();
+                OperationFuture<CASValue<Object>> future = shell.get(key);
+                future.get();
+                long end = System.nanoTime();
+                builder.append(formatStatusLine(future.getStatus()));
+                CASValue<Object> data = future.get();
+                if (future.getStatus().isSuccess()) {
+                    builder.append(", CAS: " + data.getCas());
+                }
+                long diff = end - start;
+                total += diff;
+                builder.append(", Time: " + TimeUnit.NANOSECONDS.toMicros(diff) + "µs");
+                if (diff < totalMin) {
+                    totalMin = diff;
+                }
+                if (diff > totalMax) {
+                    totalMax = diff;
+                }
+                builder.append("\n");
+                Thread.sleep(del);
+            }
+            builder.append("Total: " + TimeUnit.NANOSECONDS.toMicros(total) + "µs");
+            builder.append(", Average: " + TimeUnit.NANOSECONDS.toMicros(total / totalRuns) + "µs");
+            builder.append(", Min: " + TimeUnit.NANOSECONDS.toMicros(totalMin) + "µs");
+            builder.append(", Max: " + TimeUnit.NANOSECONDS.toMicros(totalMax) + "µs");
             return builder.toString();
         } catch (Exception ex) {
             return "Could not get document " + key + " because of an error! ";
